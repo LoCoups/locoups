@@ -222,11 +222,11 @@ export default function Searchbar() {
         </div>
       </div>
       {searchInput && (
-        <div className=' mt-1 w-64 text-sm text-gray-900 bg-gray-50 rounded-e-lg border-s-gray-50 border-s-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-s-gray-700  dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500'>
+        <div className=' items-center py-2.5 px-4 z-10 w-full text-sm text-gray-900 bg-gray-50 rounded-e-lg border-s-gray-50 border-s-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-s-gray-700  dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500'>
           <ul>
             {filteredData.map((item, index) => (
               <li key={index}>
-                {item.coupon} {item.company}
+                 {item.company}
               </li>
             ))}
           </ul>
