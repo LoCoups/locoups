@@ -36,19 +36,19 @@ export default function Searchbar() {
       />
 
       <table>
-              <tbody>
-                <tr>
-                  <th>Company</th>
-                  <th>Coupon</th>
-                </tr>
-                {filteredData.map((item, index) => (
-                  <tr key={index}>
-                    <td>{item.company}</td>
-                    <td>{item.coupon}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <tbody>
+          <tr>
+            <th>Company</th>
+            <th>Coupon</th>
+          </tr>
+          {filteredData.map((item, index) => (
+            <tr key={index}>
+              <td>{item.company}</td>
+              <td>{item.coupon}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div> 
 
   )
