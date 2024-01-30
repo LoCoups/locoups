@@ -1,49 +1,21 @@
 import Image from 'next/image'
 import Coupon from './components/coupon'
-
-const coupons = [
-  {
-    name: "McDonalds",
-    deal: "$5 off $20"
-  },
-  {
-    name: "Taco Bell",
-    deal: "$4 off $20"
-  },
-  {
-    name: "Chick-Fil-A",
-    deal: "$3 off $20"
-  },
-  {
-    name: "Raising Canes",
-    deal: "$6 off $20"
-  },
-  {
-    name: "Raising Canes",
-    deal: "$6 off $20"
-  },
-  {
-    name: "Raising Canes",
-    deal: "$6 off $20"
-  },
-  {
-    name: "Raising Canes",
-    deal: "$6 off $20"
-  },
-]
+import couponData from './coupons.json'
 
 export default function Home() {
   return (
-    <main className="flex w-full flex-wrap min-h-screen overflow-y-auto p-12">
-      {coupons.map((coupon, index) => {
-        return (
-          <Coupon
-            key={index}
-            name={coupon.name}
-            deal={coupon.deal}
-          />
-        )
-      })}
+    <main className="min-h-screen">
+      <div className='flex flex-wrap justify-between w-full p-12'>
+        {couponData.map((coupon, index) => {
+          return (
+            <Coupon
+              key={index}
+              coupon={coupon}
+            />
+          )
+        })}
+      </div>
+      {/* <img src='https://s7d1.scene7.com/is/image/mcdonalds/Header_BigMac_832x472:product-header-desktop?wid=830&hei=456&dpr=off'></img> */}
     </main>
   )
 }
