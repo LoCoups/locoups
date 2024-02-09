@@ -1,20 +1,39 @@
 // prisma/seed.ts
 
 import { PrismaClient } from "@prisma/client";
-// import { links } from '../data/links'
+import testData from "./testData.json";
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.user.create({
-    data: {
-      email: `testemail@gmail.com`,
-      role: "ADMIN",
-    },
-  });
+  // Iterate over the testData array and create a business for each object
+  for (const businessData of testData) {
+    const { coupons, categories, photos, ...business } = businessData;
 
-  // await prisma.link.createMany({
-  //   data: links,
-  // })
+    // Create the business in the database
+    const createdBusiness = await prisma.business.create({
+      data: {
+        ...business,
+        // Create coupons for the business
+        coupons: {
+          create: coupons.map((coupon) => ({
+            description: coupon.description,
+          })),
+        },
+        // Create categories for the business
+        categories: {
+          create: categories.map((category) => ({
+            category,
+          })),
+        },
+        // Create photos for the business
+        photos: {
+          create: photos,
+        },
+      },
+    });
+
+    console.log(`Created business with ID: ${createdBusiness.id}`);
+  }
 }
 
 main()

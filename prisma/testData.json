@@ -1,0 +1,50 @@
+[
+  {
+    "name": "McDonalds",
+    "address": "123 Main St",
+    "city": "Anytown",
+    "state": "CA",
+    "zipCode": "12345",
+    "neighborhood": "Downtown",
+    "longitude": null,
+    "latitude": null,
+    "coupons": [
+      {
+        "description": "$5 off $20",
+        "users": []
+      }
+    ],
+    "categories": [],
+    "photos": [
+      {
+        "imgUrl": "https://s7d1.scene7.com/is/image/mcdonalds/Header_BigMac_832x472:product-header-desktop?wid=830&hei=456&dpr=off",
+        "caption": "Photo caption here",
+        "label": "Photo label here"
+      }
+    ]
+  },
+  {
+    "name": "Taco Bell",
+    "address": "456 Elm St",
+    "city": "Othertown",
+    "state": "NY",
+    "zipCode": "54321",
+    "neighborhood": "Suburb",
+    "longitude": null,
+    "latitude": null,
+    "coupons": [
+      {
+        "description": "$4 off $20",
+        "users": []
+      }
+    ],
+    "categories": [],
+    "photos": [
+      {
+        "imgUrl": "https://s7d1.scene7.com/is/image/mcdonalds/Header_BigMac_832x472:product-header-desktop?wid=830&hei=456&dpr=off",
+        "caption": "Photo caption here",
+        "label": "Photo label here"
+      }
+    ]
+  }
+]
