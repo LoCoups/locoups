@@ -9,6 +9,12 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum Role {
+  USER
+  ADMIN
+}
+
 model Business {
   id          Int      @id @default(autoincrement())
   name        String
@@ -19,4 +25,55 @@ model Business {
   neighborhood String
   longitude   Float?
   latitude    Float?
+  coupons     Coupon[]
+  categories  Category[]
+  photos      Photo[]
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  category  String?  
+  businesses Business[]
+}
+
+
+model User {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  email     String?  @unique
+  image     String?
+  role      Role     @default(USER)
+  bookmarks Link[]
+  coupons   Coupon[]
+}
+
+model Photo {
+  id          Int      @id @default(autoincrement())
+  imgUrl    String
+  business    Business @relation(fields: [businessId], references: [id])
+  businessId  Int
+  caption     String?
+  label       String?
+}
+
+model Coupon {
+  id          Int      @id @default(autoincrement())
+  businessId  Int
+  business    Business @relation(fields: [businessId], references: [id])
+  description String
+  users       User[]
+}
+
+
+model Link {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  title       String
+  description String
+  url         String
+  imageUrl    String
+  category    String
+  users      User[]
 }
