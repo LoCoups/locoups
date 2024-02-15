@@ -1,63 +1,249 @@
-export const typeDefs = `
-  type Link {
-    id: ID
-    title: String
-    description: String
-    url: String
-    category: String
-    imageUrl: String
-    users: [String]
-  }
+import {
+  asNexusMethod,
+  objectType,
+  makeSchema,
+  queryType,
+  mutationType,
+  enumType,
+  nonNull,
+  stringArg,
+  idArg,
+} from "nexus";
+import * as path from "path";
+// import { DateTimeResolver } from "graphql-scalars";
 
-  type Business {
-    id: ID
-    name: String
-    address: String 
-    city: String
-    state: String
-    zipCode: String
-    neighborhood: String
-    longitude: Float
-    latitude: Float
-    coupons: [Coupon]
-    categories: [Category]
-    photos: [Photo]
-  }
-  
-  type User {
-    id: ID
-    createdAt: String
-    updatedAt: String
-    email: String
-    image: String
-    role: Role
-    bookmarks: [Link]
-    coupons: [Coupon]
-  }
+const Link = objectType({
+  name: "Link",
+  definition(t) {
+    t.id("id");
+    t.string("title");
+    t.string("description");
+    t.string("url");
+    t.string("category");
+    t.string("imageUrl");
+    t.list.string("users");
+  },
+});
 
-  type Coupon {
-    id: ID
-    business: Business
-    description: String
-    users: [User]
-  }
+const Business = objectType({
+  name: "Business",
+  definition(t) {
+    t.id("id");
+    t.string("name");
+    t.string("address");
+    t.string("city");
+    t.string("state");
+    t.string("zipCode");
+    t.string("neighborhood");
+    t.float("longitude");
+    t.float("latitude");
+    t.list.field("coupons", {
+      type: Coupon,
+    });
+    t.list.field("categories", {
+      type: Category,
+    });
+    t.list.field("photos", {
+      type: Photo,
+    });
+  },
+});
 
-  type Category {
-    id: ID
-    category: String
-    businesses: [Business]
-  }
+const User = objectType({
+  name: "User",
+  definition(t) {
+    t.id("id");
+    t.string("createdAt");
+    t.string("updatedAt");
+    t.string("email");
+    t.string("image");
+    t.field("role", { type: Role });
+    t.list.field("bookmarks", {
+      type: Link,
+    });
+    t.list.field("coupons", {
+      type: Coupon,
+    });
+  },
+});
 
-  enum Role {
-    USER
-    ADMIN
-  }
+const Coupon = objectType({
+  name: "Coupon",
+  definition(t) {
+    t.id("id");
+    t.field("business", { type: Business });
+    t.string("description");
+    t.list.field("users", {
+      type: User,
+    });
+  },
+});
 
-  type Query {
-    links: [Link]!
-    businesses: [Business]!
-    coupons: [Coupon]!
-    categories: [Category]!
-    users: [User]!
-  }
-`;
+const Category = objectType({
+  name: "Category",
+  definition(t) {
+    t.id("id");
+    t.string("category");
+    t.list.field("businesses", {
+      type: Business,
+    });
+  },
+});
+
+const Photo = objectType({
+  name: "photo",
+  definition(t) {
+    t.id("id");
+    t.field("business", { type: Business });
+    t.string("caption");
+    t.string("label");
+    t.string("imgUrl");
+  },
+});
+
+const Role = enumType({
+  name: "Role",
+  members: ["USER", "ADMIN"],
+});
+const SortOrder = enumType({
+  name: "SortOrder",
+  members: ["asc", "desc"],
+});
+
+const Query = queryType({
+  definition(t) {
+    t.list.field("getBusinesses", {
+      type: Business,
+      resolve: async (_, args, ctx) => {
+        try {
+          const businesses = await ctx.db.business.findMany();
+          return businesses.map((business) => ({
+            id: business.id.toString(),
+            name: business.name,
+            address: business.address,
+            city: business.city,
+            state: business.state,
+            zipCode: business.zipCode,
+            neighborhood: business.neighborhood,
+            longitude: business.longitude,
+            latitude: business.latitude,
+          }));
+        } catch (error) {
+          throw new Error(`${error}`);
+        }
+      },
+    });
+  },
+});
+
+const Mutation = mutationType({
+  definition(t) {
+    t.field("addBusiness", {
+      type: Business,
+      args: {
+        name: nonNull(stringArg()),
+        address: nonNull(stringArg()),
+        city: stringArg(),
+        state: stringArg(),
+        zipCode: stringArg(),
+        neighborhood: stringArg(),
+        longitude: stringArg(),
+        latitude: stringArg(),
+      },
+      resolve: async (_, args, ctx) => {
+        try {
+          const createdBusiness = await ctx.db.business.create({
+            data: {
+              name: args.name,
+              address: args.address,
+              city: args.city ?? "",
+              state: args.state ?? "",
+              zipCode: args.zipCode ?? "",
+              neighborhood: args.neighborhood ?? "",
+              longitude: parseFloat(args.longitude ?? ""),
+              latitude: parseFloat(args.latitude ?? ""),
+            },
+          });
+          // Ensure that the id is converted to a string
+          const businessWithIdAsString = {
+            ...createdBusiness,
+            id: createdBusiness.id.toString(),
+          };
+          return businessWithIdAsString;
+        } catch (error) {
+          throw new Error(`${error}`);
+        }
+      },
+    });
+
+    t.field("updateBusiness", {
+      type: Business,
+      args: {
+        id: nonNull(idArg()),
+        name: nonNull(stringArg()),
+        address: nonNull(stringArg()),
+        city: stringArg(),
+        state: stringArg(),
+        zipCode: stringArg(),
+        neighborhood: stringArg(),
+        longitude: stringArg(),
+        latitude: stringArg(),
+      },
+      resolve: async (_, args, ctx) => {
+        try {
+          const updatedBusiness = await ctx.db.business.update({
+            where: { id: parseInt(args.id) },
+            data: {
+              name: args.name,
+              address: args.address,
+              city: args.city ?? "",
+              state: args.state ?? "",
+              zipCode: args.zipCode ?? "",
+              neighborhood: args.neighborhood ?? "",
+              longitude: parseFloat(args.longitude ?? ""),
+              latitude: parseFloat(args.latitude ?? ""),
+            },
+          });
+          const businessWithIdAsString = {
+            ...updatedBusiness,
+            id: updatedBusiness.id.toString(),
+          };
+          return businessWithIdAsString;
+        } catch (error) {
+          throw Error(`${error}`);
+        }
+      },
+    });
+    t.field("deleteBusiness", {
+      type: Business,
+      args: {
+        id: nonNull(idArg()),
+      },
+      resolve: async (_, args, ctx) => {
+        await ctx.db.business.delete({
+          where: { id: parseInt(args.id) },
+        });
+        return null;
+      },
+    });
+  },
+});
+export const schema = makeSchema({
+  types: [Link, Business, User, Coupon, Category, Role, Query, Mutation],
+  outputs: {
+    schema: path.join(process.cwd(), "graphql/schema.graphql"),
+    typegen: path.join(process.cwd(), "graphql/generated/nexus.d.ts"),
+  },
+  contextType: {
+    module: path.join(process.cwd(), "graphql/context.ts"),
+    export: "Context",
+  },
+  sourceTypes: {
+    modules: [
+      {
+        module: "@prisma/client",
+        alias: "db",
+      },
+    ],
+  },
+});
